@@ -3,6 +3,8 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import csv
 
+DOMAIN_NAME = "http://localhost:8080"
+
 def send_email(class_file, course_info_file):
     # Initialize email content
     sender_email = 'ISU.optimal.groups@gmail.com'
@@ -32,7 +34,7 @@ def send_email(class_file, course_info_file):
                 print(netid)
                 code = row[2]
                 email = f"{netid}@iastate.edu"
-                link = f'http://127.0.0.1:5000/frontend/preferences.html?course={course}&code={code}'
+                link = f'{DOMAIN_NAME}/frontend/preferences.html?course={course}&code={code}'
 
                 msg = MIMEMultipart()
                 msg['From'] = sender_email

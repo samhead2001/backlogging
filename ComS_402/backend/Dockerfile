@@ -13,7 +13,7 @@ ENV MODULE app
 # Service must listen to $PORT environment variable.
 ENV PORT 8080
  
-COPY requirements.txt ./
+COPY src/requirements.txt ./
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
@@ -29,6 +29,8 @@ RUN pip install gunicorn
 # Bundle app source
 COPY __init__.py $APP_HOME/$MODULE/
 COPY src $APP_HOME/$MODULE/src
+
+# COPY src/frontend $APP_HOME/$MODULE/src
 #COPY tests $APP_HOME/$MODULE/tests
  
 # COPY . .

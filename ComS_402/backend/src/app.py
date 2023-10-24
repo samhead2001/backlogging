@@ -1,5 +1,9 @@
 
-from flask import Flask, request, redirect, jsonify, Blueprint
+from flask import Flask, request, redirect, jsonify
+# from routes import routes
+from app.src.routes import routes
+import app.src.csvParser as csvParser
+import app.src.automate_email as automate_email
 from werkzeug.utils import secure_filename
 from datetime import datetime
 import pandas as pd
@@ -8,17 +12,20 @@ import csv
 import traceback
 import random
 import string
-import csvParser
-import automate_email
 
 parser = csvParser
 emailer = automate_email
 
 
 app = Flask(__name__)
-# app.register_blueprint(routes)
-app.config['STORAGE_FOLDER'] = 'optimalgroups_csv_storage' 
+app.register_blueprint(routes)
+app.config['STORAGE_FOLDER'] = 'optimal-groups/ComS_402/optimalgroups_csv_storage'
 app.config['NET_ID_IDENTIFIER'] = 'SIS Login ID'
+
+# Create the directory if it doesn't exist
+storage_directory = app.config['STORAGE_FOLDER']
+if not os.path.exists(storage_directory):
+    os.makedirs(storage_directory)
 
 # Generates unique verification codes for the students in the class
 def generate_codes(csv_file, listLength, codeLength):
@@ -33,12 +40,9 @@ def generate_codes(csv_file, listLength, codeLength):
         codes.append(random_string)
     return codes
 
-@app.route('/upload', methods=['GET'])
-def go_to_upload():
-    return redirect('/ComS_402/frontend/upload.html')
-
 @app.route('/submit-form', methods=['POST'])
 def upload_file():
+
 
     instructor_csv = request.files['file']
     group_size = request.form.get('groupSize') 
@@ -49,6 +53,7 @@ def upload_file():
     course = course.replace(" ", "_")
     file_path = os.path.join(app.config['STORAGE_FOLDER'], secure_filename(
         course + '_' + instructor_csv.filename))
+    print(file_path)
     temp_csv = pd.read_csv(instructor_csv)
     
     try:
