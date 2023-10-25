@@ -4,6 +4,9 @@ from flask import Flask, request, redirect, jsonify
 from app.src.routes import routes
 import app.src.csvParser as csvParser
 import app.src.automate_email as automate_email
+# from routes import routes
+# import csvParser
+# import automate_email
 from werkzeug.utils import secure_filename
 from datetime import datetime
 import pandas as pd
@@ -19,7 +22,7 @@ emailer = automate_email
 
 app = Flask(__name__)
 app.register_blueprint(routes)
-app.config['STORAGE_FOLDER'] = 'optimal-groups/ComS_402/optimalgroups_csv_storage'
+app.config['STORAGE_FOLDER'] = 'ComS_402/backend/src/optimalgroups_csv_storage'
 app.config['NET_ID_IDENTIFIER'] = 'SIS Login ID'
 
 # Create the directory if it doesn't exist
@@ -192,5 +195,19 @@ def submit():
         
         return redirect('/frontend/thanks.html')
 
+@app.route('/read_csv/<csv_filename>', methods=['GET'])
+def read_csv(csv_filename):
+    csv_path = os.path.join(app.config['STORAGE_FOLDER'], csv_filename)
+
+    if not os.path.exists(csv_path) or not csv_filename.endswith('.csv'):
+        return jsonify({"error": "CSV file not found or invalid file name."}), 404
+
+    try:
+        with open(csv_path, mode='r', newline='') as file:
+            reader = csv.reader(file)
+            data = [row for row in reader]
+            return jsonify({"data": data})
+    except Exception as e:
+        return jsonify({"error": f"Error reading CSV file: {str(e)}"}), 500
 if __name__ == '__main__':
     app.run(debug=True)
