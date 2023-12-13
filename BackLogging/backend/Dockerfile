@@ -16,6 +16,7 @@ ENV PORT 8080
 # Install required dependencies for OpenCV and OpenGL
 RUN apt-get update && \
     apt-get install -y libgl1-mesa-glx libglib2.0-0 && \
+    apt-get -y install tesseract-ocr && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
